@@ -1,0 +1,500 @@
+//
+//  Home.swift
+//  UI-391
+//
+//  Created by nyannyan0328 on 2021/12/13.
+//
+
+import SwiftUI
+
+struct Home: View {
+    @State var pizas : [Pizza] = [
+    
+        Pizza(breadName: "Bread_1"),
+        Pizza(breadName: "Bread_2"),
+        Pizza(breadName: "Bread_3"),
+        Pizza(breadName: "Bread_4"),
+        Pizza(breadName: "Bread_5"),
+    
+    
+    ]
+    
+    
+    @State var currentPiza : String = "Bread_1"
+    
+    @State var currentSize : pizaSize = .Medium
+    @Namespace var animation
+    
+    let toppings : [String] = ["Basil","Onion","Broccoli","Mushroom","Sausage"]
+    var body: some View {
+        VStack{
+            
+            HStack{
+                
+                Button {
+                    
+                } label: {
+                    
+                    Image(systemName: "arrow.left")
+                        .font(.title2)
+                        
+                }
+                
+                Spacer()
+                
+                
+                Button {
+                    
+                } label: {
+                    
+                    Image(systemName: "suit.heart.fill")
+                        .font(.title2)
+                        
+                }
+
+            }
+            .foregroundColor(.black)
+            .overlay(
+            
+            Text("Pizza")
+                .font(.system(size: 20, weight: .semibold))
+            
+            )
+            .padding()
+            
+            GeometryReader{proxy in
+                
+                
+                let size = proxy.size
+                ZStack{
+                    
+                    Image("Plate")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding(.horizontal,30)
+                        .padding(.vertical,10)
+                    
+                    
+                    TabView(selection: $currentPiza) {
+                        
+                        ForEach(pizas){piza in
+                            
+                            
+                            
+                            ZStack{
+                                
+                                Image(piza.breadName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding(40)
+                                
+                                
+                                ToppingsView(toppings:piza.toppings, width: (size.width / 2) - 45, piza: piza)
+                                
+                                  
+                            }
+                            .scaleEffect(currentSize == .Large ? 1.2 : (currentSize == .Medium ? 0.9 : 0.8))
+                            .tag(piza.breadName)
+                                
+                        }
+                        
+                        
+                        
+                        
+                    }
+                    .tabViewStyle(.page(indexDisplayMode: .never))
+                        
+                    
+                    
+                    
+                }
+                
+                .frame(maxWidth:.infinity,maxHeight: .infinity)
+                
+                
+                
+                
+            }
+            .frame(height: 300)
+            
+            
+            
+            
+                        ScrollView(UIScreen.main.bounds.height < 750 ? .vertical : .init(), showsIndicators: false) {
+                
+                
+                Group{
+                    
+                    
+                    Text("$17")
+                        .font(.title.weight(.black))
+                        .foregroundColor(.black)
+                        .padding(.top,10)
+                    
+                    HStack(spacing:15){
+                        
+                        
+                        ForEach(pizaSize.allCases,id:\.self){size in
+                            
+                            
+                            Button {
+                                withAnimation{
+                                    
+                                    currentSize = size
+                                }
+                            } label: {
+                                Text(size.rawValue)
+                                    .font(.caption.bold())
+                                    .foregroundColor(.black)
+                                    .padding(20)
+                                    .background(
+                                    
+                                        
+                                        ZStack{
+                                            
+                                            if currentSize == size{
+                                                
+                                                Color.white.clipShape(Circle())
+                                                    .shadow(color: .black.opacity(0.3), radius: 5, x: 5, y: 5)
+                                                    .shadow(color: .black.opacity(0.01), radius: -5, x: -5, y: -5)
+                                                    .matchedGeometryEffect(id: "PIZZASIZE", in: animation)
+
+                                            }
+                                        }
+                                    
+
+                                    )
+                            }
+
+                        }
+                        
+                        
+                    }
+                    
+                    
+                    
+                    CustomToppings()
+                    
+              
+                    
+                    
+                    Button {
+                        
+                    } label: {
+                        
+                        
+                                 
+                        HStack(spacing:10) {
+                            Image(systemName: "cart.fill")
+                                .font(.title)
+                              
+                            
+                            Text("Add to Cart")
+                                .font(.title.weight(.bold))
+                               
+                              
+                        }
+                        .foregroundColor(.white)
+                        .padding(.vertical,10)
+                        .padding(.horizontal,45)
+                       
+            
+                        .background(Color("Brown"),in:RoundedRectangle(cornerRadius: 15))
+                            
+                            
+                           
+                        
+                    }
+                    .frame(maxHeight:.infinity)
+
+                      
+                    
+                    
+                    
+                }
+                
+                
+                
+                
+          }
+            
+            
+        }
+        .frame(maxWidth:.infinity,maxHeight: .infinity,alignment: .top)
+    }
+    
+    
+
+    
+    
+    @ViewBuilder
+    func CustomToppings()->some View{
+        
+        
+        Group{
+            
+            
+            Text("Custom Youre Pizza")
+                .font(.title2.weight(.semibold))
+                .foregroundColor(.gray)
+                .frame(maxWidth:.infinity,alignment: .leading)
+                .padding(.top,30)
+                .padding(.leading)
+            
+            
+            ScrollViewReader{proxy in
+                
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    
+                    
+                    
+                    
+                    HStack(spacing:-10){
+                        
+                        ForEach(toppings,id:\.self){topping in
+                            
+                            Image("\(topping)_3")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 40, height: 40)
+                                .padding(10)
+                                .background(
+                                
+                                    Color.green.clipShape(Circle())
+                                        .opacity(isAdded(topping: topping) ? 0.12 : 0)
+                                        .animation(.easeInOut, value: currentPiza)
+                                        
+                                
+                                
+                                )
+                                .padding()
+                                .contentShape(Circle())
+                                .onTapGesture {
+                                    
+                                    
+                                    if isAdded(topping: topping){
+                                        
+                                        
+                                        
+                                        if let index = pizas[getIndex(breadName: currentPiza)].toppings.firstIndex(where: { currenToppping in
+                                            
+                                            return topping == currenToppping.toppingName
+                                            
+                                            
+                                        }){
+                                            
+                                            pizas[getIndex(breadName: currentPiza)].toppings.remove(at: index)
+                                            
+                                            
+                                        }
+                                        
+                                        
+                                    }
+                                    
+                                    
+                                    var positons : [CGSize] = []
+                                    
+                                    
+                                    for _ in 1...20{
+                                        
+                                        
+                                        positons.append(.init(width:.random(in: -20...60) , height: .random(in: -50...50)))
+                                        
+                                        
+                                        
+                                    }
+                                    
+                                   
+                                    
+                                    let toppingObject = Topping(toppingName: topping,randomTopicPosticion: positons)
+                                    
+                                    
+                                    
+                                    withAnimation{
+                                        
+                                        
+                                        
+                                        pizas[getIndex(breadName: currentPiza)].toppings.append(toppingObject)
+                                        
+                                        
+                                    }
+                        
+                                    
+                                    
+                                }
+                                .tag(topping)
+                            
+                            
+                            
+                        }
+                    }
+                    
+                    
+                  
+                    
+                    
+                    
+                }
+                
+            }
+            
+            
+        }
+        
+        
+        
+    }
+    
+    
+    
+    @ViewBuilder
+    func ToppingsView(toppings : [Topping],width : CGFloat,piza : Pizza)->some View{
+        
+        
+        
+        Group{
+            
+            
+            
+            ForEach(toppings.indices,id:\.self){index in
+                
+                let topping = toppings[index]
+                
+                
+                ZStack{
+                    
+                    ForEach(1...20,id:\.self){subindex in
+                        
+                        
+                        let rotation : Double = Double(subindex) * 36
+                        
+                        
+                        
+                        let currentIndex = (subindex > 10 ? (subindex - 10) : subindex)
+                        
+                        
+                        
+                        Image("\(topping.toppingName)_\(currentIndex)")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 35, height: 35)
+                            .offset(x: (width / 2) - topping.randomTopicPosticion[subindex - 1].width, y: topping.randomTopicPosticion[subindex - 1].height)
+
+                        
+                        
+                            .rotationEffect(.init(degrees: rotation))
+                        
+                        
+                    }
+                    
+                    
+                    
+                }
+                .scaleEffect(topping.isAdded ? 1 : 10,anchor:.center)
+                .onAppear {
+              
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                        
+                        
+                        
+                        withAnimation{
+                            
+                            pizas[getIndex(breadName: piza.breadName)].toppings[index].isAdded = true
+                            
+                            
+                        }
+                   
+                        
+                        
+                        
+                    }
+                    
+                    
+                    
+            
+                   
+                    
+                    
+                }
+                
+                
+                
+                
+                
+                
+            }
+            
+            
+            
+        }
+        
+        
+        
+        
+    }
+    
+    func isAdded(topping : String) -> Bool{
+        
+        
+        let status = pizas[getIndex(breadName: currentPiza)].toppings.contains { currentTopping in
+            return currentTopping.toppingName == topping
+        }
+        
+        return status
+    }
+    
+    
+    
+    
+    func getIndex(breadName : String) -> Int{
+        
+        let index = pizas.firstIndex { pizza in
+            return pizza.breadName == breadName
+        } ?? 0
+        
+        return index
+    }
+    
+    
+    
+    
+    
+    
+}
+
+struct Home_Previews: PreviewProvider {
+    static var previews: some View {
+        Home()
+    }
+}
+enum pizaSize : String,CaseIterable{
+    
+    
+    case Small = "S"
+    case Medium = "M"
+    case Large = "L"
+    
+    
+    
+}
+
+struct Topping: Identifiable {
+    var id = UUID().uuidString
+    var toppingName : String
+    var isAdded : Bool = false
+    var randomTopicPosticion : [CGSize] = []
+}
+
+struct Pizza: Identifiable {
+    var id = UUID().uuidString
+    var breadName : String
+    var toppings : [Topping] = []
+}
+
+
+
+
+
+
